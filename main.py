@@ -29,11 +29,11 @@ async def compute_position(request: Request):
         theta2_rad = np.radians(theta2)
 
         # Compute constants
-        K1 = (d**2 - a**2 - b**2 - c**2) / (2 * a * c)
-        K2 = d / a
-        K3 = d / c
-        K4 = b / a
-        K5 = b / c
+        K3 = (a**2 - b**2 + c**2 + d**2) / (2 * a * c)
+        K1 = d / a
+        K2 = d / c
+        K4 = d / b
+        K5 = (c**2 - d**2 - a**2 - b**2) / (2 * a * b)
 
         # Compute A, B, C for θ4
         A = np.cos(theta2_rad) - K1 - K2 * np.cos(theta2_rad) + K3
@@ -44,6 +44,7 @@ async def compute_position(request: Request):
         discriminant = B**2 - 4 * A * C
         if discriminant < 0:
             return {"error": "No real solution for θ4"}
+
 
         theta4_rad_1 = 2 * np.arctan((-B + np.sqrt(discriminant)) / (2 * A))
         theta4_rad_2 = 2 * np.arctan((-B - np.sqrt(discriminant)) / (2 * A))
