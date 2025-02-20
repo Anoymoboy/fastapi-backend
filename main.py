@@ -29,16 +29,16 @@ async def compute_position(request: Request):
         theta2_rad = np.radians(theta2)
 
         # Compute constants
-        K3 = (a**2 - b**2 + c**2 + d**2) / (2 * a * c)
         K1 = d / a
         K2 = d / c
+        K3 = (a**2 - b**2 + c**2 + d**2) / (2 * a * c)
         K4 = d / b
         K5 = (c**2 - d**2 - a**2 - b**2) / (2 * a * b)
 
         # Compute A, B, C for θ4
         A = np.cos(theta2_rad) - K1 - K2 * np.cos(theta2_rad) + K3
         B = -2 * np.sin(theta2_rad)
-        C = K1 + (K2 - K3) * np.cos(theta2_rad) + 1
+        C = K1 - (K2 +1) * np.cos(theta2_rad) + K3
 
         # Compute θ4 using Freudenstein’s equation
         discriminant = B**2 - 4 * A * C
@@ -62,7 +62,7 @@ async def compute_position(request: Request):
         if discriminant1 < 0:
             return {"error": "No real solution for θ3"}
 
-        theta3_rad_1 = 2 * np.arctan((-E + np.sqrt(discriminant1)) / (2 * D))
+        theta3_rad_1 = 2 * np.arctan((-E - np.sqrt(discriminant1)) / (2 * D))
         theta3_rad_2 = 2 * np.arctan((-E + np.sqrt(discriminant1)) / (2 * D))
 
         theta3_1 = np.degrees(theta3_rad_1)
