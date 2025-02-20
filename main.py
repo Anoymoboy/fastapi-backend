@@ -5,24 +5,25 @@ import numpy as np
 app = FastAPI()
 
 class PositionRequest(BaseModel):
-    a: float
-    b: float
-    c: float
-    d: float
-    theta2: float
+    a: float | None = 0
+    b: float | None = 0
+    c: float | None = 0
+    d: float | None = 0
+    theta2: float | None = 0
 
 @app.post("/compute_position/")
 async def compute_position(request: Request):
-    """Ensure all input values are converted to float."""
+    """Logs and processes the incoming request for debugging."""
     data = await request.json()
+    print("Received request:", data)  # Log the incoming JSON data
 
     try:
-        # Convert all values to float (handles string inputs from Bubble.io)
-        a = float(data.get("a", 0))
-        b = float(data.get("b", 0))
-        c = float(data.get("c", 0))
-        d = float(data.get("d", 0))
-        theta2 = float(data.get("theta2", 0))
+        # Ensure all values are numbers, replacing None with 0
+        a = float(data.get("a", 0) or 0)
+        b = float(data.get("b", 0) or 0)
+        c = float(data.get("c", 0) or 0)
+        d = float(data.get("d", 0) or 0)
+        theta2 = float(data.get("theta2", 0) or 0)
 
         # Compute theta3 and theta4 (Same logic as before)
         theta2_rad = np.radians(theta2)
