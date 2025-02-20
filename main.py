@@ -46,8 +46,8 @@ async def compute_position(request: Request):
             return {"error": "No real solution for θ4"}
 
 
-        theta4_rad_1 = 2 * np.arctan((-B + np.sqrt(discriminant)) / (2 * A))
-        theta4_rad_2 = 2 * np.arctan((-B - np.sqrt(discriminant)) / (2 * A))
+        theta4_rad_1 = 2 * np.arctan((-B - np.sqrt(discriminant)) / (2 * A))
+        theta4_rad_2 = 2 * np.arctan((-B + np.sqrt(discriminant)) / (2 * A))
 
         theta4_1 = np.degrees(theta4_rad_1)
         theta4_2 = np.degrees(theta4_rad_2)
