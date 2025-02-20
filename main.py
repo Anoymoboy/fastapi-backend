@@ -1,31 +1,32 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
+import numpy as np
 
 app = FastAPI()
 
-# Define a request model to properly receive JSON data
+# Define a request model for kinematics calculations
 class KinematicsRequest(BaseModel):
     a: float
     b: float
     c: float
     theta1: float
-    x_b: float
-    y_b: float
-    x_c: float
-    y_c: float
 
-kinematics_results = {}
+@app.post("/compute_kinematics/")
+def compute_kinematics(data: KinematicsRequest):
+    """Computes four-bar linkage kinematics given user input."""
+    
+    # Convert theta1 from degrees to radians
+    theta1_rad = np.radians(data.theta1)
 
-@app.post("/receive_kinematics/")
-def receive_kinematics(data: KinematicsRequest):
-    """Receives kinematics results from MATLAB."""
-    global kinematics_results
-    kinematics_results = data.dict()  # Convert to dictionary
-    return {"message": "Kinematics data received successfully!"}
+    # Compute joint positions
+    x_b = data.a * np.cos(theta1_rad)
+    y_b = data.a * np.sin(theta1_rad)
+    x_c = x_b + data.b
+    y_c = y_b
 
-@app.get("/kinematics/")
-def get_kinematics():
-    """Returns the last stored kinematics result."""
-    if not kinematics_results:
-        return {"error": "No kinematics data available"}
-    return kinematics_results
+    return {
+        "message": "Kinematics computed successfully!",
+        "B": [x_b, y_b],
+        "C": [x_c, y_c]
+    }
+
