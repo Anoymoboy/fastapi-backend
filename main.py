@@ -5,10 +5,10 @@ import numpy as np
 app = FastAPI()
 
 class KinematicsRequest(BaseModel):
-    a: float
-    b: float
-    c: float
-    theta1: float
+    a: float | None = 0
+    b: float | None = 0
+    c: float | None = 0
+    theta1: float | None = 0
 
 @app.post("/compute_kinematics/")
 async def compute_kinematics(request: Request):
@@ -17,11 +17,11 @@ async def compute_kinematics(request: Request):
         # Read JSON request
         data = await request.json()
 
-        # Convert values to float (handles string inputs)
-        a = float(data.get("a", 0))
-        b = float(data.get("b", 0))
-        c = float(data.get("c", 0))
-        theta1 = float(data.get("theta1", 0))
+        # Ensure values are not None before converting to float
+        a = float(data["a"]) if data.get("a") is not None else 0.0
+        b = float(data["b"]) if data.get("b") is not None else 0.0
+        c = float(data["c"]) if data.get("c") is not None else 0.0
+        theta1 = float(data["theta1"]) if data.get("theta1") is not None else 0.0
 
         # Compute kinematics
         theta1_rad = np.radians(theta1)
@@ -32,5 +32,5 @@ async def compute_kinematics(request: Request):
 
         return {"message": "Kinematics computed successfully!", "B": [x_b, y_b], "C": [x_c, y_c]}
     
-    except ValueError:
-        return {"error": "Invalid input. Ensure all values are numbers."}
+    except Exception as e:
+        return {"error": f"Invalid input. Ensure all values are numbers. Details: {str(e)}"}
