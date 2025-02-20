@@ -53,20 +53,17 @@ async def compute_position(request: Request):
         theta4_2 = np.degrees(theta4_rad_2)
 
         # Compute D, E, F for θ3
-        D1 = np.cos(theta2_rad) - K4 + K5 * np.cos(theta4_rad_1) + K2
-        D2 = np.cos(theta2_rad) - K4 + K5 * np.cos(theta4_rad_2) + K2
+        D = np.cos(theta2_rad) - K4 + K5 * np.cos(theta2_rad) + K2
         E = -2 * np.sin(theta2_rad)
-        F1 = K4 + (K5 - K2) * np.cos(theta4_rad_1) + 1
-        F2 = K4 + (K5 - K2) * np.cos(theta4_rad_2) + 1
+        F = K1 + (K4 - 1) * np.cos(theta2_rad) + K5
 
-        discriminant1 = E**2 - 4 * D1 * F1
-        discriminant2 = E**2 - 4 * D2 * F2
+        discriminant1 = E**2 - 4 * D * F
 
-        if discriminant1 < 0 or discriminant2 < 0:
+        if discriminant1 < 0:
             return {"error": "No real solution for θ3"}
 
-        theta3_rad_1 = 2 * np.arctan((-E + np.sqrt(discriminant1)) / (2 * D1))
-        theta3_rad_2 = 2 * np.arctan((-E + np.sqrt(discriminant2)) / (2 * D2))
+        theta3_rad_1 = 2 * np.arctan((-E + np.sqrt(discriminant1)) / (2 * D))
+        theta3_rad_2 = 2 * np.arctan((-E + np.sqrt(discriminant1)) / (2 * D))
 
         theta3_1 = np.degrees(theta3_rad_1)
         theta3_2 = np.degrees(theta3_rad_2)
