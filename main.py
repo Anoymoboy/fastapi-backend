@@ -53,7 +53,7 @@ async def compute_position(request: Request):
         theta4_2 = np.degrees(theta4_rad_2)
 
         # Compute D, E, F for θ3
-        D = np.cos(theta2_rad) - K4 + K5 * np.cos(theta2_rad) + K2
+        D = np.cos(theta2_rad) - K1 + K4 * np.cos(theta2_rad) + K5
         E = -2 * np.sin(theta2_rad)
         F = K1 + (K4 - 1) * np.cos(theta2_rad) + K5
 
