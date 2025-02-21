@@ -3,12 +3,18 @@ from pydantic import BaseModel
 import numpy as np
 from functools import lru_cache
 import logging
+import uvicorn
 
 # Set up logging for debugging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
+
+# Health check route (to test if FastAPI is running)
+@app.get("/")
+def home():
+    return {"message": "FastAPI is running on Railway!"}
 
 # Define input model
 class PositionRequest(BaseModel):
@@ -94,3 +100,8 @@ async def compute_position(request: Request):
     except Exception as e:
         logger.error(f"Error: {str(e)}")
         return {"error": f"Invalid input: {str(e)}"}
+
+# Run FastAPI on Railway's required settings
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
+
