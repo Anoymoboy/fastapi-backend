@@ -78,13 +78,19 @@ async def compute_position(request: Request):
     """API Endpoint to compute four-bar linkage kinematics."""
     data = await request.json()
     
+    def safe_float(value, default=0):
     try:
-        # Extract values with default 0 to prevent crashes
-        a = float(data.get("a", 0))
-        b = float(data.get("b", 0))
-        c = float(data.get("c", 0))
-        d = float(data.get("d", 0))
-        theta2 = float(data.get("theta2", 0))
+        return float(value) if value is not None else default
+    except ValueError:
+        return default
+
+a = safe_float(data.get("a"), 0)
+b = safe_float(data.get("b"), 0)
+c = safe_float(data.get("c"), 0)
+d = safe_float(data.get("d"), 0)
+theta2 = safe_float(data.get("theta2"), 0)
+
+
 
         # Log received data for debugging
         logger.info(f"Received data: {data}")
