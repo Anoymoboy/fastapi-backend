@@ -1,9 +1,9 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import numpy as np
-from functools import lru_cache
 import logging
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 # Setup logging for debugging
 logging.basicConfig(level=logging.INFO)
@@ -33,7 +33,7 @@ class PositionRequest(BaseModel):
     d: float  # Ground link length
     theta2: float  # Input angle in degrees
 
-# Caching function for efficiency (but avoids unhashable issues)
+# Function to compute kinematics
 def compute_kinematics(a: float, b: float, c: float, d: float, theta2: float):
     """Computes θ4 first, then θ3 using Freudenstein’s equation for a four-bar linkage."""
     try:
@@ -89,29 +89,21 @@ def compute_kinematics(a: float, b: float, c: float, d: float, theta2: float):
 async def compute_position(request_data: PositionRequest):
     """API Endpoint to compute four-bar linkage kinematics."""
     try:
-        # Extract values from request
-        a = request_data.a
-        b = request_data.b
-        c = request_data.c
-        d = request_data.d
-        theta2 = request_data.theta2
-
-        # Log received data for debugging
-        logger.info(f"Received data: {request_data}")
+        # Extract values
+        a, b, c, d, theta2 = request_data.a, request_data.b, request_data.c, request_data.d, request_data.theta2
 
         # Compute kinematics
         result = compute_kinematics(a, b, c, d, theta2)
 
-        # Log response
-        logger.info(f"Response: {result}")
-
-        return {"message": "Kinematics computed successfully!", "result": result}
+        # Return proper JSON response (Fix Bubble double-encoding issue)
+        return JSONResponse(content={"message": "Kinematics computed successfully!", "result": result})
 
     except ValueError as ve:
-        raise HTTPException(status_code=400, detail=str(ve))
+        return JSONResponse(status_code=400, content={"error": str(ve)})
+
     except Exception as e:
         logger.error(f"Unexpected error: {str(e)}")
-        raise HTTPException(status_code=500, detail="Server error")
+        return JSONResponse(status_code=500, content={"error": "Server error", "details": str(e)})
 
 # Run FastAPI on Railway's required settings
 if __name__ == "__main__":
