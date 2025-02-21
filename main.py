@@ -79,16 +79,31 @@ async def compute_position(request: Request):
     data = await request.json()
     
     def safe_float(value, default=1):
-    try:
-        return float(value) if value is not None else default
-    except ValueError:
-        return default
+        try:
+            return float(value) if value is not None else default
+        except ValueError:
+            return default
 
-a = safe_float(data.get("a"), 1)
-b = safe_float(data.get("b"), 1)
-c = safe_float(data.get("c"), 1)
-d = safe_float(data.get("d"), 1)
-theta2 = safe_float(data.get("theta2"), 1)
+    a = safe_float(data.get("a"), 1)
+    b = safe_float(data.get("b"), 1)
+    c = safe_float(data.get("c"), 1)
+    d = safe_float(data.get("d"), 1)
+    theta2 = safe_float(data.get("theta2"), 1)
+
+    # Log received data for debugging
+    logger.info(f"Received data: {data}")
+
+    # Compute kinematics
+    result = compute_kinematics(a, b, c, d, theta2)
+
+    # Log response
+    logger.info(f"Response: {result}")
+
+    return {"message": "Kinematics computed successfully!", "result": result}
+
+except Exception as e:
+    logger.error(f"Error: {str(e)}")
+    return {"error": f"Invalid input: {str(e)}"}
 
 
 
